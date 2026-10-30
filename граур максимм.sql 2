@@ -1,0 +1,56 @@
+
+-- Populate the parent table (10 rows).
+INSERT INTO public."Disciplines"
+    ("name", "description", "year_introduced")
+VALUES
+    ('Mathematics', 'Fundamentals of mathematical analysis and calculations', 2020),
+    ('Computer Science', 'Algorithms, data, and fundamentals of programming', 2021),
+    ('Databases', 'Relational model, SQL, and database design', 2022),
+    ('Programming', 'Fundamentals of software development using high-level languages', 2020),
+    ('Computer Networks', 'Principles of computer network design and configuration', 2019),
+    ('Operating Systems', 'Operating system structure and administration', 2021),
+    ('Web Development', 'Creating client-side and server-side web applications', 2023),
+    ('Information Security', 'Fundamentals of information protection and secure practices', 2022),
+    ('Discrete Mathematics', 'Logic, sets, graphs, and combinatorics', 2018),
+    ('Software Design', 'Methods for analyzing and designing software systems', 2024);
+
+-- Populate the dependent table (10 rows).
+-- Teacher IDs are illustrative; this variant does not define a Teachers table.
+INSERT INTO public."Teaching_Load"
+    ("teacher_id", "discipline_id", "hourly_rate", "hourly_pay")
+VALUES
+    (1, 1, 850.00, 850.00),
+    (2, 2, 900.00, 900.00),
+    (3, 3, 950.00, 950.00),
+    (1, 4, 900.00, 900.00),
+    (4, 5, 800.00, 800.00),
+    (5, 6, 850.00, 850.00),
+    (2, 7, 1000.00, 1000.00),
+    (6, 8, 1100.00, 1100.00),
+    (3, 9, 900.00, 900.00),
+    (4, 10, 1050.00, 1050.00);
+
+-- Check table contents.
+SELECT * FROM public."Disciplines" ORDER BY "discipline_id";
+SELECT * FROM public."Teaching_Load" ORDER BY "teacher_id", "discipline_id";
+
+-- Check the relationship: teaching load together with discipline names.
+SELECT
+    n."teacher_id",
+    d."name" AS "discipline",
+    n."hourly_rate",
+    n."hourly_pay"
+FROM public."Teaching_Load" AS n
+JOIN public."Disciplines" AS d
+  ON d."discipline_id" = n."discipline_id"
+ORDER BY n."teacher_id", d."name";
+
+-- Check constraints (optional; these statements should fail):
+-- INSERT INTO public."Teaching_Load" VALUES (99, 9999, 100.00, 100.00); -- discipline does not exist
+-- INSERT INTO public."Teaching_Load" VALUES (1, 1, -10.00, 100.00);    -- negative rate
+--
+-- Cascade delete can be tested separately on a test row:
+-- BEGIN;
+-- DELETE FROM public."Disciplines" WHERE "discipline_id" = 10;
+-- SELECT * FROM public."Teaching_Load" WHERE "discipline_id" = 10; -- there should be no rows
+-- ROLLBACK; -- roll back the test to restore the record
